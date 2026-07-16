@@ -155,6 +155,8 @@ else:
 
     # Exibe a logo na sidebar
     st.sidebar.markdown('<div class="logo-container"></div>', unsafe_allow_html=True)
+    
+    
 @st.cache_resource
 def db():
     connection = sqlite3.connect(DB, check_same_thread=False)
@@ -479,7 +481,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-st.markdown('<div class="wlhl-title">☎️ The Weight Loss Hotline</div><div class="muted">Search every episode, transcript, and coaching concept.</div>', unsafe_allow_html=True)
+st.markdown('<div class="wlhl-title">☎️ The Weight Loss Hotline ☎️</div><div class="muted">Search every episode, transcript, and coaching concept.</div>', unsafe_allow_html=True)
 st.write("")
 c = db()
 
