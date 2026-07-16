@@ -18,13 +18,33 @@ DB = ROOT / "database.sqlite"
 import os
 import streamlit as st
 import base64
+import os
+import base64
+import streamlit as st
 
-# Determinar-se-á o caminho absoluto para evitar falhas de leitura no sistema
+# REGRA 1: O set_page_config deve ser sempre o primeiro comando executado!
+st.set_page_config(
+    page_title="WLHL Knowledge Base", 
+    page_icon="☎️", 
+    layout="wide", 
+    initial_sidebar_state="expanded"
+)
+
+
+
+# O set_page_config deve permanecer como a primeira instrução
+st.set_page_config(
+    page_title="WLHL Knowledge Base", 
+    page_icon="☎️", 
+    layout="wide", 
+    initial_sidebar_state="expanded"
+)
+
+# Determinar-se-á o caminho absoluto para as imagens
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 LOGO_LIGHT = os.path.join(BASE_DIR, "imgs", "logo_light.png")
 LOGO_DARK = os.path.join(BASE_DIR, "imgs", "logo_dark.png")
 
-# Exibir-se-á uma mensagem de erro caso os arquivos físicos não existam no disco
 if not os.path.exists(LOGO_LIGHT) or not os.path.exists(LOGO_DARK):
     st.sidebar.error("Verificar-se-á a existência das imagens na pasta 'imgs'.")
 else:
@@ -35,46 +55,106 @@ else:
     b64_light = obter_base64(LOGO_LIGHT)
     b64_dark = obter_base64(LOGO_DARK)
 
-    # Utilizar-se-ão as variáveis de estilo do Streamlit para alternar a exibição
-    st.sidebar.markdown(
+    # Injeção unificada de CSS
+    st.markdown(
         f"""
         <style>
-            /* Definir-se-á a visibilidade padrão com base nas variáveis do Streamlit */
-            [data-testid="stSidebar"] {{
-                --logo-light: url(data:image/jpeg;base64,{b64_light});
-                --logo-dark: url(data:image/jpeg;base64,{b64_dark});
-            }}
-            
-            .logo-container {{
-                width: 100%;
-                height: 120px;
-                background-size: contain;
-                background-repeat: no-repeat;
-                background-position: center;
-                background-image: var(--logo-light);
-            }}
+        /* 1. Estilização Dinâmica dos Pequenos Painéis (Métricas) */
+        [data-testid="stMetric"] {{
+            background-color: var(--secondary-background-color) !important; 
+            color: var(--text-color) !important;
+            border: 1px solid var(--border-color) !important;
+            border-radius: 14px !important;
+            padding: 15px !important;
+        }}
+        
+        [data-testid="stMetricLabel"] {{
+            color: var(--text-color) !important;
+            opacity: 0.8; 
+        }}
+        
+        [data-testid="stMetricValue"] {{
+            color: var(--text-color) !important;
+            font-weight: bold;
+        }}
 
-            /* Detectar-se-á o modo escuro através das preferências do navegador */
-            @media (prefers-color-scheme: dark) {{
-                .logo-container {{
-                    background-image: var(--logo-dark);
-                }}
+        /* 2. Estilos Gerais da Página */
+        .block-container {{
+            max-width: 1240px;
+            padding-top: 1.2rem;
+            padding-bottom: 3rem;
+        }}
+        .wlhl-title {{
+            font-size: 2.15rem;
+            font-weight: 800;
+            letter-spacing: -.04em;
+            line-height: 1.1;
+        }}
+        .muted, .result-count {{
+            color: #64748b;
+        }}
+        .tag {{
+            display: inline-block;
+            background: #e6f7f5;
+            color: #075e59;
+            border-radius: 999px;
+            padding: 3px 9px;
+            margin: 2px;
+            font-size: .82rem;
+        }}
+        [data-testid="stTextInput"] input {{
+            font-size: 1.08rem;
+            padding: .78rem;
+        }}
+        .stButton button {{
+            border-radius: 10px;
+        }}
+        mark {{
+            background: #fef08a;
+            padding: 0 2px;
+        }}
+        .section-space {{
+            height: .6rem;
+        }}
+
+        /* 3. Lógica de Alternância das Imagens baseada em variáveis nativas do Streamlit */
+        [data-testid="stSidebar"] {{
+            /* Armazenam-se ambas as imagens em variáveis locais da barra lateral */
+            --logo-l: url(data:image/png;base64,{b64_light});
+            --logo-d: url(data:image/png;base64,{b64_dark});
+        }}
+
+        .logo-container {{
+            width: 100%;
+            height: 120px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            
+            /* Esta variável nativa (--background-color) é alterada pelo Streamlit automaticamente. */
+            /* Se a cor de fundo padrão for clara, exibe-se a logo clara; caso contrário, exibe-se a escura. */
+            background-image: var(--logo-l) !important;
+        }}
+
+        /* Se a classe do aplicativo principal indicar tema escuro */
+        .stApp[data-theme="dark"] .logo-container,
+        [data-theme="dark"] .logo-container {{
+            background-image: var(--logo-d) !important;
+        }}
+
+        /* Caso o Streamlit isole o escopo, aplicamos uma regra alternativa baseada na cor do texto */
+        @media (prefers-color-scheme: dark) {{
+            .logo-container {{
+                background-image: var(--logo-d) !important;
             }}
+        }}
         </style>
-        <div class="logo-container"></div>
         """,
         unsafe_allow_html=True
     )
-st.set_page_config(page_title="WLHL Knowledge Base", page_icon="☎️", layout="wide", initial_sidebar_state="expanded")
-st.markdown("""<style>
-.block-container{max-width:1240px;padding-top:1.2rem;padding-bottom:3rem}
-.wlhl-title{font-size:2.15rem;font-weight:800;letter-spacing:-.04em;line-height:1.1}
-.muted,.result-count{color:#64748b}.tag{display:inline-block;background:#e6f7f5;color:#075e59;border-radius:999px;padding:3px 9px;margin:2px;font-size:.82rem}
-[data-testid="stMetric"]{background:#f8fafc;border:1px solid #e2e8f0;padding:15px;border-radius:14px}
-[data-testid="stTextInput"] input{font-size:1.08rem;padding:.78rem}.stButton button{border-radius:10px}
-mark{background:#fef08a;padding:0 2px}.section-space{height:.6rem}
-</style>""", unsafe_allow_html=True)
 
+    # Exibe a logo na sidebar
+    st.sidebar.markdown('<div class="logo-container"></div>', unsafe_allow_html=True)
 @st.cache_resource
 def db():
     connection = sqlite3.connect(DB, check_same_thread=False)
@@ -593,3 +673,83 @@ else:
             with st.container(border=True): st.write(f"**{row['episode_id']} · {row['episode_title']}**"); st.caption(f"{row['issue_type']} · {row['detail']}")
 
 episode_dialog()
+
+
+
+# import streamlit as str
+# import sqlite3
+# import requests
+# import base64
+# import os
+
+# # Configurações do vosso repositório (ajustar conforme necessário)
+# REPO_DONO = "cfreis"
+# REPO_NOME = "WLHL_Knowledge_Base"
+# CAMINHO_BANCO = "dados.db"  # Nome do vosso arquivo SQLite no repositório
+
+# def salvar_banco_no_github():
+#     """Esta função lê o SQLite local do Streamlit Cloud e envia para o GitHub"""
+    
+#     # Busca o token que salvamos nos Secrets de forma segura
+#     token = st.secrets.get("GITHUB_TOKEN")
+#     if not token:
+#         st.warning("Token do GitHub não configurado nos Secrets.")
+#         return
+
+#     url = f"https://api.github.com/repos/{REPO_DONO}/{REPO_NOME}/contents/{CAMINHO_BANCO}"
+#     headers = {
+#         "Authorization": f"token {token}",
+#         "Accept": "application/vnd.github.v3+json"
+#     }
+
+#     # Passo A: Obter o 'sha' do arquivo atual no GitHub (necessário para atualizar)
+#     resposta = requests.get(url, headers=headers)
+#     sha = ""
+#     if resposta.status_code == 200:
+#         sha = resposta.json().get("sha", "")
+
+#     # Passo B: Ler o arquivo SQLite local e converter para Base64
+#     if not os.path.exists(CAMINHO_BANCO):
+#         return
+        
+#     with open(CAMINHO_BANCO, "rb") as f:
+#         conteudo_binario = f.read()
+#     conteudo_base64 = base64.b64encode(conteudo_binario).decode("utf-8")
+
+#     # Passo C: Enviar o commit de volta para o repositório
+#     dados_commit = {
+#         "message": "database: atualização automática via Streamlit Cloud",
+#         "content": conteudo_base64,
+#         "sha": sha if sha else None
+#     }
+    
+#     enviar = requests.put(url, headers=headers, json=dados_commit)
+#     if enviar.status_code in [200, 201]:
+#         st.toast("Banco de dados persistido no GitHub com sucesso!", icon="💾")
+#     else:
+#         st.error(f"Erro ao salvar no GitHub: {enviar.text}")
+
+
+
+# # Exemplo de fluxo de salvamento:
+# conexao = sqlite3.connect("dados.db")
+# cursor = conexao.cursor()
+# cursor.execute("INSERT INTO tabela (coluna) VALUES ('novo_dado')")
+# conexao.commit()
+# conexao.close()
+
+# # Dispara a persistência imediata para a nuvem do GitHub!
+# salvar_banco_no_github()
+
+# git add .
+# git commit -m "feat: adicionada persistência automática do SQLite"
+# git push origin main
+
+    
+    # Há um único detalhe que merecerá vossa atenção. Quando realizardes alterações no código em vosso computador pessoal (Fedora) e desejardes enviar um git push, o vosso repositório remoto no GitHub poderá conter uma versão do dados.db mais recente (com dados inseridos pelos usuários na nuvem) do que a versão antiga que tendes salva localmente.
+    
+    # Para evitar que um envio acidental do vosso computador sobrescreva os dados novos da nuvem, recomendar-se-á realizar o seguinte procedimento simples no terminal do vosso Fedora antes de programar ou fazer um novo envio:
+    
+    # Bash
+    # git pull origin main
+    # Este comando trazer-vos-á a versão mais atualizada do banco de dados do GitHub diretamente para a vossa máquina de desenvolvimento, mantendo ambos os ambientes em perfeita sintonia.

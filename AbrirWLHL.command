@@ -8,7 +8,7 @@ echo "Opening the WLHL Knowledge Base..."
 echo ""
 
 if curl -fsS --max-time 2 http://localhost:8501/ >/dev/null 2>&1; then
-  open http://localhost:8501/
+  xdg-open http://localhost:8501/
   echo "The application was already open."
   read -k 1 "?Press any key to close this window."
   exit 0
@@ -25,7 +25,7 @@ if [[ ! -x ".venv/bin/python" ]]; then
   .venv/bin/python -m pip install -r requirements.txt || exit 1
 fi
 
-(sleep 3; open http://localhost:8501/) &
+(sleep 3; xdg-open http://localhost:8501/) &
 echo "The application will open in your browser."
 echo "Keep this window open while using WLHL."
 echo "Press Control + C here to stop the app."
