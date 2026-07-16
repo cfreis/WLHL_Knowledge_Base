@@ -1,0 +1,18 @@
+WLHL KNOWLEDGE BASE
+
+MAC
+1. Install Python 3 from python.org if it is not already installed.
+2. Double-click "Abrir WLHL.command".
+3. The first launch installs Streamlit and may take a few minutes.
+4. Keep the Terminal window open while using the app.
+5. Press Control + C in that window to stop the app.
+
+WINDOWS
+1. Install Python 3 from python.org if it is not already installed.
+2. Double-click "Open WLHL.bat".
+3. The first launch installs Streamlit and may take a few minutes.
+4. Keep the command window open while using the app.
+5. Close that command window to stop the app.
+
+The app runs only on this computer. After the first setup, the knowledge base
+can be searched without an internet connection.
